@@ -33,6 +33,6 @@
   <!-- 底部留白 -->
   <view class="home-footer">
     <view class="home-footer__text">更多工具即将上线</view>
-    <view class="home-footer__version">V2.02 Powered By ZC</view>
+    <view class="home-footer__version">V2.03 Powered By ZC</view>
   </view>
 </view>
