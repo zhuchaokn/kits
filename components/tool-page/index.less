@@ -1,0 +1,53 @@
+@import '/variable.less';
+
+.tool-page {
+  min-height: 100vh;
+  background: @bg-color;
+
+  &__navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: @bg-color-white;
+    box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+  }
+
+  &__navbar-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 88rpx;
+    position: relative;
+  }
+
+  &__back {
+    position: absolute;
+    left: 16rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 80rpx;
+    height: 80rpx;
+  }
+
+  &__title {
+    font-size: 34rpx;
+    font-weight: 500;
+    color: @gy1;
+  }
+
+  &__right {
+    position: absolute;
+    right: 32rpx;
+    display: flex;
+    align-items: center;
+  }
+
+  &__content {
+    min-height: 100vh;
+    box-sizing: border-box;
+  }
+}
+

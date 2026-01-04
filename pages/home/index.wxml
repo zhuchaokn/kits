@@ -1,0 +1,38 @@
+<view class="home-container">
+  <!-- 顶部标题 -->
+  <view class="home-header">
+    <view class="home-header__title">
+      <text class="home-header__title-main">工具箱</text>
+      <text class="home-header__title-sub">简单好用的小工具</text>
+    </view>
+  </view>
+
+  <!-- 工具列表 -->
+  <view class="home-tool-grid">
+    <view 
+      class="tool-item"
+      wx:for="{{toolList}}"
+      wx:key="id"
+      bindtap="onToolTap"
+      data-tool="{{item}}"
+      style="background: {{item.bgColor}};"
+    >
+      <view class="tool-item__icon" style="background: {{item.color}};">
+        <t-icon name="{{item.icon}}" size="56rpx" color="#fff" />
+      </view>
+      <view class="tool-item__info">
+        <view class="tool-item__name">{{item.name}}</view>
+        <view class="tool-item__desc">{{item.desc}}</view>
+      </view>
+      <view class="tool-item__arrow">
+        <t-icon name="chevron-right" size="40rpx" color="#ccc" />
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部留白 -->
+  <view class="home-footer">
+    <view class="home-footer__text">更多工具即将上线</view>
+    <view class="home-footer__version">V2.02 Powered By ZC</view>
+  </view>
+</view>

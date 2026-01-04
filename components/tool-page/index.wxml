@@ -1,0 +1,20 @@
+<view class="tool-page">
+  <!-- 自定义导航栏 -->
+  <view class="tool-page__navbar" style="padding-top: {{statusBarHeight}}px;">
+    <view class="tool-page__navbar-content">
+      <view class="tool-page__back" bindtap="goBack" wx:if="{{showBack}}">
+        <t-icon name="chevron-left" size="48rpx" color="#333" />
+      </view>
+      <text class="tool-page__title">{{title}}</text>
+      <view class="tool-page__right">
+        <slot name="navbar-right"></slot>
+      </view>
+    </view>
+  </view>
+
+  <!-- 内容区域 -->
+  <view class="tool-page__content" style="padding-top: {{statusBarHeight + 44}}px;">
+    <slot></slot>
+  </view>
+</view>
+

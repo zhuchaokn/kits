@@ -1,0 +1,13 @@
+<view class="tool-card tool-card--{{size}}" bindtap="onTap" hover-class="tool-card--hover">
+  <view class="tool-card__icon-wrap" style="background-color: {{tool.bgColor}};">
+    <t-icon name="{{tool.icon}}" size="{{size === 'small' ? '40rpx' : '56rpx'}}" color="{{tool.color}}" />
+  </view>
+  <view class="tool-card__content">
+    <view class="tool-card__header">
+      <text class="tool-card__name">{{tool.name}}</text>
+      <t-tag wx:if="{{tool.hot}}" size="small" theme="danger" variant="light">热门</t-tag>
+    </view>
+    <text class="tool-card__desc" wx:if="{{size !== 'small'}}">{{tool.desc}}</text>
+  </view>
+</view>
+

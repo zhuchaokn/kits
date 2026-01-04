@@ -1,0 +1,114 @@
+@import '/variable.less';
+
+.tool-card {
+  display: flex;
+  align-items: center;
+  background: @bg-color-white;
+  border-radius: 16rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+
+  &--hover {
+    transform: scale(0.98);
+    background: #f8f8f8;
+  }
+
+  &--normal {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 24rpx;
+
+    .tool-card__icon-wrap {
+      width: 80rpx;
+      height: 80rpx;
+      margin-bottom: 16rpx;
+      flex-shrink: 0;
+    }
+
+    .tool-card__content {
+      width: 100%;
+    }
+
+    .tool-card__name {
+      font-size: 28rpx;
+    }
+
+    .tool-card__desc {
+      margin-top: 8rpx;
+      font-size: 22rpx;
+      color: @gy3;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      line-height: 1.4;
+    }
+  }
+
+  &--small {
+    flex-direction: column;
+    padding: 20rpx 12rpx;
+
+    .tool-card__icon-wrap {
+      width: 72rpx;
+      height: 72rpx;
+      margin-bottom: 12rpx;
+      flex-shrink: 0;
+    }
+
+    .tool-card__name {
+      font-size: 24rpx;
+      text-align: center;
+    }
+
+    .tool-card__header {
+      justify-content: center;
+    }
+  }
+
+  &--large {
+    flex-direction: row;
+    padding: 24rpx;
+
+    .tool-card__icon-wrap {
+      width: 96rpx;
+      height: 96rpx;
+      margin-right: 24rpx;
+      flex-shrink: 0;
+    }
+
+    .tool-card__name {
+      font-size: 30rpx;
+    }
+
+    .tool-card__desc {
+      margin-top: 8rpx;
+      font-size: 24rpx;
+      color: @gy3;
+    }
+  }
+
+  &__icon-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 20rpx;
+  }
+
+  &__content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 12rpx;
+  }
+
+  &__name {
+    font-weight: 500;
+    color: @gy1;
+  }
+}

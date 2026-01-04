@@ -1,0 +1,133 @@
+<view class="video-audio-page">
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{!videoPath}}">
+    <view class="empty-icon">🎵</view>
+    <view class="empty-title">视频提取音频</view>
+    <view class="empty-desc">从视频中提取音频，保存为音频文件</view>
+    
+    <view class="source-buttons">
+      <view class="source-btn source-btn--recommended" bindtap="chooseFromAlbum">
+        <view class="source-btn__icon">📹</view>
+        <view class="source-btn__text">
+          <view class="source-btn__title">从相册选择 <text class="recommend-tag">推荐</text></view>
+          <view class="source-btn__desc">速度更快，建议先保存视频到相册</view>
+        </view>
+      </view>
+      
+      <view class="source-btn" bindtap="chooseFromChat">
+        <view class="source-btn__icon">💬</view>
+        <view class="source-btn__text">
+          <view class="source-btn__title">从微信选择</view>
+          <view class="source-btn__desc">聊天记录中的视频（可能较慢）</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 编辑区域 -->
+  <view class="editor" wx:if="{{videoPath}}">
+    <!-- 视频预览区域 -->
+    <view class="preview-section">
+      <view class="section-title">视频预览</view>
+      <view class="video-container">
+        <!-- 关闭按钮 -->
+        <view class="close-btn" bindtap="clearVideo">✕</view>
+        <video 
+          id="videoPlayer"
+          class="video-player" 
+          src="{{videoPath}}"
+          controls
+          show-center-play-btn
+          object-fit="contain"
+          bindloadedmetadata="onVideoLoaded"
+          binderror="onVideoError"
+        />
+      </view>
+      <view class="video-info" wx:if="{{duration > 0}}">
+        <view class="info-item">
+          <text class="info-label">时长</text>
+          <text class="info-value">{{durationText}}</text>
+        </view>
+        <view class="info-item" wx:if="{{fileSize}}">
+          <text class="info-label">大小</text>
+          <text class="info-value">{{fileSize}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 提取状态 -->
+    <view class="status-section" wx:if="{{extractStatus !== 'idle'}}">
+      <view class="status-card {{extractStatus}}">
+        <view class="status-icon">
+          <text wx:if="{{extractStatus === 'extracting'}}">⏳</text>
+          <text wx:if="{{extractStatus === 'success'}}">✅</text>
+          <text wx:if="{{extractStatus === 'error'}}">❌</text>
+        </view>
+        <view class="status-content">
+          <view class="status-title">
+            <text wx:if="{{extractStatus === 'extracting'}}">正在提取音频...</text>
+            <text wx:if="{{extractStatus === 'success'}}">提取成功</text>
+            <text wx:if="{{extractStatus === 'error'}}">提取失败</text>
+          </view>
+          <view class="status-desc" wx:if="{{extractStatus === 'extracting'}}">
+            请稍候，正在处理中
+          </view>
+          <view class="status-desc" wx:if="{{extractStatus === 'error'}}">
+            {{errorMsg || '请重试或更换视频'}}
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 音频播放器 -->
+    <view class="audio-section" wx:if="{{audioPath}}">
+      <view class="section-title">提取的音频</view>
+      <view class="audio-player-card">
+        <view class="audio-controls">
+          <view class="play-btn {{isPlaying ? 'playing' : ''}}" bindtap="togglePlay">
+            <text wx:if="{{!isPlaying}}">▶</text>
+            <text wx:if="{{isPlaying}}">⏸</text>
+          </view>
+          <view class="audio-info">
+            <view class="audio-progress-bar">
+              <view class="audio-progress" style="width: {{playProgress}}%;"></view>
+            </view>
+            <view class="audio-time">
+              <text>{{currentTimeText}}</text>
+              <text>{{durationText}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 操作按钮 -->
+    <view class="action-section">
+      <view class="action-buttons" wx:if="{{!audioPath}}">
+        <button class="btn-primary" bindtap="extractAudio" loading="{{extractStatus === 'extracting'}}">
+          <text class="btn-icon">🎵</text> 提取音频
+        </button>
+      </view>
+      
+      <view class="action-buttons" wx:if="{{audioPath}}">
+        <button class="btn-primary" bindtap="saveAudio">
+          <text class="btn-icon">💾</text> 保存音频
+        </button>
+        <button class="btn-secondary" bindtap="shareAudio">
+          <text class="btn-icon">📤</text> 分享
+        </button>
+      </view>
+    </view>
+
+    <!-- 提示信息 -->
+    <view class="tips-section">
+      <view class="tips-title">💡 使用提示</view>
+      <view class="tips-list">
+        <view class="tips-item">• 支持大部分常见视频格式</view>
+        <view class="tips-item">• 提取的音频为 AAC 格式</view>
+        <view class="tips-item">• 保存后可在微信文件中找到</view>
+      </view>
+    </view>
+  </view>
+</view>
+

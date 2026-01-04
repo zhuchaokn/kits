@@ -1,0 +1,310 @@
+<view class="watermark-page">
+  <!-- 隐藏的 Canvas -->
+  <canvas type="2d" id="watermarkCanvas" class="hidden-canvas"></canvas>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{!imagePath}}">
+    <view class="empty-icon">💧</view>
+    <view class="empty-title">图片加水印</view>
+    <view class="empty-desc">为图片添加文字水印，支持拖动定位</view>
+    
+    <view class="source-buttons">
+      <view class="source-btn" bindtap="chooseFromAlbum">
+        <view class="source-btn__icon">🖼️</view>
+        <view class="source-btn__text">
+          <view class="source-btn__title">从相册选择</view>
+          <view class="source-btn__desc">选择本地图片</view>
+        </view>
+      </view>
+      
+      <view class="source-btn" bindtap="chooseFromChat">
+        <view class="source-btn__icon">💬</view>
+        <view class="source-btn__text">
+          <view class="source-btn__title">从微信选择</view>
+          <view class="source-btn__desc">聊天记录中的图片</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 编辑区域 -->
+  <scroll-view class="editor" scroll-y wx:if="{{imagePath}}">
+    <!-- 预览区域 -->
+    <view class="preview-section">
+      <view class="section-title">预览（{{repeatMode ? '重复模式' : '拖动调整位置'}}）</view>
+      <view 
+        class="preview-container"
+        bindtouchstart="onTouchStart"
+        bindtouchmove="onTouchMove"
+        bindtouchend="onTouchEnd"
+        bindtap="previewImage"
+      >
+        <!-- 关闭按钮 -->
+        <view class="close-btn" catchtap="clearImage">✕</view>
+        
+        <image 
+          class="preview-image" 
+          src="{{imagePath}}" 
+          mode="aspectFit"
+        />
+        
+        <!-- 水印预览层 -->
+        <view class="watermark-layer">
+          <!-- 单个水印 -->
+          <view 
+            wx:if="{{!repeatMode}}"
+            class="watermark-single"
+            style="left: {{positionX}}%; top: {{positionY}}%; transform: translate(-50%, -50%) rotate({{rotation}}deg); color: {{fontColor}}; opacity: {{opacity / 100}}; font-size: {{fontSize}}rpx;"
+          >
+            {{watermarkText}}
+          </view>
+          
+          <!-- 重复水印 -->
+          <view wx:if="{{repeatMode}}" class="watermark-repeat">
+            <view 
+              wx:for="{{repeatRowsArray}}" 
+              wx:for-item="row" 
+              wx:for-index="rowIndex"
+              wx:key="rowIndex"
+              class="watermark-row"
+              style="height: {{100 / repeatRows}}%;"
+            >
+              <view 
+                wx:for="{{repeatColsArray}}" 
+                wx:for-item="col"
+                wx:for-index="colIndex"
+                wx:key="colIndex"
+                class="watermark-cell"
+                style="width: {{100 / repeatCols}}%;"
+              >
+                <text 
+                  class="watermark-text"
+                  style="transform: rotate({{rotation}}deg); color: {{fontColor}}; opacity: {{opacity / 100}}; font-size: {{fontSize * 0.6}}rpx;"
+                >{{watermarkText}}</text>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+      <view class="preview-tip">点击预览大图</view>
+    </view>
+
+    <!-- 水印文字和颜色 -->
+    <view class="setting-section">
+      <input 
+        class="text-input" 
+        placeholder="输入水印文字" 
+        value="{{watermarkText}}"
+        bindinput="onTextInput"
+      />
+      <view class="color-list color-list--inline">
+        <view 
+          class="color-item {{fontColor === item ? 'active' : ''}}"
+          wx:for="{{colors}}"
+          wx:key="*this"
+          style="background: {{item}};"
+          bindtap="onColorSelect"
+          data-color="{{item}}"
+        ></view>
+        <view class="color-item color-item--more" bindtap="openColorPicker">
+          <text>+</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 颜色选择器弹窗 -->
+    <view class="color-picker-mask {{showColorPicker ? 'show' : ''}}" bindtap="closeColorPicker"></view>
+    <view class="color-picker-popup {{showColorPicker ? 'show' : ''}}">
+      <view class="color-picker-header">
+        <text class="color-picker-title">选择颜色</text>
+        <view class="color-picker-close" bindtap="closeColorPicker">✕</view>
+      </view>
+      
+      <!-- 当前颜色预览 -->
+      <view class="color-picker-preview">
+        <view class="preview-color" style="background: {{fontColor}};"></view>
+        <text class="preview-value">{{fontColor}}</text>
+      </view>
+      
+      <!-- 更多颜色 -->
+      <view class="color-picker-section">
+        <view class="color-picker-label">常用颜色</view>
+        <view class="color-grid">
+          <view 
+            class="color-grid-item {{fontColor === item ? 'active' : ''}}"
+            wx:for="{{moreColors}}"
+            wx:key="*this"
+            style="background: {{item}};"
+            bindtap="onMoreColorSelect"
+            data-color="{{item}}"
+          ></view>
+        </view>
+      </view>
+      
+      <!-- 自定义颜色 -->
+      <view class="color-picker-section">
+        <view class="color-picker-label">自定义颜色</view>
+        <view class="custom-color-input">
+          <input 
+            class="color-input" 
+            placeholder="#FFFFFF" 
+            value="{{customColorInput}}"
+            bindinput="onCustomColorInput"
+            maxlength="7"
+          />
+          <button class="color-confirm-btn" bindtap="confirmCustomColor">确定</button>
+        </view>
+      </view>
+    </view>
+
+    <!-- 基础设置 -->
+    <view class="setting-section">
+      <view class="section-header" bindtap="toggleBasicSettings">
+        <view class="section-title">基础设置</view>
+        <view class="section-arrow {{showBasicSettings ? 'expanded' : ''}}">▶</view>
+      </view>
+      
+      <view class="collapsible-content {{showBasicSettings ? 'show' : ''}}">
+      <!-- 字体大小 -->
+      <view class="setting-row">
+        <view class="setting-label">字体大小</view>
+        <view class="setting-control">
+          <slider 
+            class="setting-slider"
+            value="{{fontSize}}" 
+            min="16" 
+            max="72"
+            block-size="20"
+            activeColor="#667eea"
+            bindchange="onFontSizeChange"
+          />
+          <input 
+            class="setting-input" 
+            type="number" 
+            value="{{fontSizeInput}}"
+            bindinput="onFontSizeInput"
+            bindblur="onFontSizeBlur"
+          />
+        </view>
+      </view>
+
+      <!-- 透明度 -->
+      <view class="setting-row">
+        <view class="setting-label">透明度</view>
+        <view class="setting-control">
+          <slider 
+            class="setting-slider"
+            value="{{opacity}}" 
+            min="1" 
+            max="100"
+            block-size="20"
+            activeColor="#667eea"
+            bindchange="onOpacityChange"
+          />
+          <input 
+            class="setting-input" 
+            type="number" 
+            value="{{opacityInput}}"
+            bindinput="onOpacityInput"
+            bindblur="onOpacityBlur"
+          />
+          <text class="setting-unit">%</text>
+        </view>
+      </view>
+
+      <!-- 旋转角度 -->
+      <view class="setting-row">
+        <view class="setting-label">旋转角度</view>
+        <view class="setting-control">
+          <slider 
+            class="setting-slider"
+            value="{{rotation}}" 
+            min="-90" 
+            max="90"
+            block-size="20"
+            activeColor="#667eea"
+            bindchange="onRotationChange"
+          />
+          <input 
+            class="setting-input" 
+            value="{{rotationInput}}"
+            bindinput="onRotationInput"
+            bindblur="onRotationBlur"
+          />
+          <text class="setting-unit">°</text>
+        </view>
+      </view>
+
+      </view>
+    </view>
+
+    <!-- 重复水印 -->
+    <view class="setting-section">
+      <view class="section-header">
+        <view class="section-title">重复水印（全图覆盖）</view>
+        <switch checked="{{repeatMode}}" bindchange="toggleRepeatMode" color="#667eea" />
+      </view>
+      
+      <view class="repeat-settings" wx:if="{{repeatMode}}">
+        <view class="setting-row">
+          <view class="setting-label">行数</view>
+          <view class="setting-control">
+            <slider 
+              class="setting-slider"
+              value="{{repeatRows}}" 
+              min="1" 
+              max="10"
+              block-size="20"
+              activeColor="#667eea"
+              bindchange="onRepeatRowsChange"
+            />
+            <input 
+              class="setting-input" 
+              type="number" 
+              value="{{repeatRowsInput}}"
+              bindinput="onRepeatRowsInput"
+              bindblur="onRepeatRowsBlur"
+            />
+          </view>
+        </view>
+        
+        <view class="setting-row">
+          <view class="setting-label">列数</view>
+          <view class="setting-control">
+            <slider 
+              class="setting-slider"
+              value="{{repeatCols}}" 
+              min="1" 
+              max="10"
+              block-size="20"
+              activeColor="#667eea"
+              bindchange="onRepeatColsChange"
+            />
+            <input 
+              class="setting-input" 
+              type="number" 
+              value="{{repeatColsInput}}"
+              bindinput="onRepeatColsInput"
+              bindblur="onRepeatColsBlur"
+            />
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 操作按钮 -->
+    <view class="action-section">
+      <view class="action-buttons">
+        <button class="btn-primary" bindtap="saveImage" loading="{{isProcessing}}">
+          <text class="btn-icon">💾</text> 保存到相册
+        </button>
+        <button class="btn-secondary" bindtap="shareImage">
+          <text class="btn-icon">📤</text> 分享
+        </button>
+      </view>
+    </view>
+
+    <!-- 底部留白 -->
+    <view class="footer-space"></view>
+  </scroll-view>
+</view>

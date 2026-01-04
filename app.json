@@ -1,0 +1,27 @@
+{
+  "pages": ["pages/home/index"],
+  "usingComponents": {
+    "t-toast": "tdesign-miniprogram/toast/toast"
+  },
+  "subpackages": [
+    {
+      "root": "pages/tools",
+      "name": "tools",
+      "pages": [
+        "image-collage/index",
+        "image-watermark/index",
+        "video-to-audio/index"
+      ]
+    }
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#667eea",
+    "navigationBarTitleText": "工具箱",
+    "navigationBarTextStyle": "white"
+  },
+  "resolveAlias": {
+    "~/*": "/*"
+  },
+  "sitemapLocation": "sitemap.json"
+}

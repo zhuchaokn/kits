@@ -1,0 +1,145 @@
+<tool-page title="图片拼接" bind:back="handleBack">
+  <view class="collage-container">
+    <!-- 预览模式 -->
+    <view class="preview-mode" wx:if="{{previewMode && resultPath}}">
+      <scroll-view class="preview-scroll" scroll-y scroll-x>
+        <image class="preview-result" src="{{resultPath}}" mode="widthFix" show-menu-by-longpress />
+      </scroll-view>
+      <view class="preview-actions">
+        <view class="preview-action" bindtap="saveImage">
+          <t-icon name="download" size="48rpx" color="#667eea" />
+          <text>保存</text>
+        </view>
+        <view class="preview-action" bindtap="shareImage">
+          <t-icon name="share" size="48rpx" color="#667eea" />
+          <text>分享</text>
+        </view>
+        <view class="preview-action" bindtap="exitPreview">
+          <t-icon name="edit" size="48rpx" color="#667eea" />
+          <text>继续编辑</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 编辑模式 -->
+    <view class="edit-mode" wx:else>
+      <!-- 图片选择区 -->
+      <view class="section">
+        <view class="section-header">
+          <text class="section-title">选择图片</text>
+          <text class="section-count">{{images.length}}/{{maxImages}}</text>
+        </view>
+        
+        <view class="image-grid">
+          <view class="image-item" wx:for="{{images}}" wx:key="path">
+            <image class="image-thumb" src="{{item.path}}" mode="aspectFill" />
+            <view class="image-index">{{index + 1}}</view>
+            <view class="image-actions">
+              <view class="image-action" catchtap="moveImage" data-index="{{index}}" data-direction="up" wx:if="{{index > 0}}">
+                <t-icon name="arrow-up" size="28rpx" color="#fff" />
+              </view>
+              <view class="image-action" catchtap="moveImage" data-index="{{index}}" data-direction="down" wx:if="{{index < images.length - 1}}">
+                <t-icon name="arrow-down" size="28rpx" color="#fff" />
+              </view>
+              <view class="image-action delete" catchtap="removeImage" data-index="{{index}}">
+                <t-icon name="close" size="28rpx" color="#fff" />
+              </view>
+            </view>
+          </view>
+          
+          <!-- 添加按钮 -->
+          <view class="add-buttons" wx:if="{{images.length < maxImages}}">
+            <view class="add-btn" bindtap="chooseFromAlbum">
+              <t-icon name="image" size="48rpx" color="#667eea" />
+              <text>相册</text>
+            </view>
+            <view class="add-btn" bindtap="chooseFromChat">
+              <t-icon name="logo-wechat-stroke" size="48rpx" color="#07C160" />
+              <text>微信</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 拼接设置 -->
+      <view class="section" wx:if="{{images.length >= 2}}">
+        <view class="section-header">
+          <text class="section-title">拼接方式</text>
+        </view>
+        <view class="layout-options">
+          <view
+            class="layout-option {{layout === item.id ? 'active' : ''}}"
+            wx:for="{{layouts}}"
+            wx:key="id"
+            bindtap="switchLayout"
+            data-layout="{{item.id}}"
+          >
+            <t-icon name="{{item.icon}}" size="44rpx" color="{{layout === item.id ? '#667eea' : '#999'}}" />
+            <text>{{item.name}}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 间距设置 -->
+      <view class="section" wx:if="{{images.length >= 2}}">
+        <view class="section-header">
+          <text class="section-title">图片间距</text>
+        </view>
+        <view class="gap-options">
+          <view
+            class="gap-option {{gap === item ? 'active' : ''}}"
+            wx:for="{{gaps}}"
+            wx:key="*this"
+            bindtap="switchGap"
+            data-gap="{{item}}"
+          >
+            {{item === 0 ? '无' : item + 'px'}}
+          </view>
+        </view>
+      </view>
+
+      <!-- 背景颜色 -->
+      <view class="section" wx:if="{{images.length >= 2 && gap > 0}}">
+        <view class="section-header">
+          <text class="section-title">背景颜色</text>
+        </view>
+        <view class="color-options">
+          <view
+            class="color-option {{bgColor === item ? 'active' : ''}}"
+            wx:for="{{bgColors}}"
+            wx:key="*this"
+            style="background-color: {{item}};"
+            bindtap="switchBgColor"
+            data-color="{{item}}"
+          />
+        </view>
+      </view>
+
+      <!-- 操作按钮 -->
+      <view class="action-buttons">
+        <t-button
+          theme="primary"
+          size="large"
+          block
+          disabled="{{images.length < 2}}"
+          loading="{{isProcessing}}"
+          bindtap="startCollage"
+        >
+          {{isProcessing ? '拼接中...' : '开始拼接'}}
+        </t-button>
+        <t-button
+          theme="light"
+          size="large"
+          block
+          bindtap="clearAll"
+          wx:if="{{images.length > 0}}"
+        >
+          清除全部
+        </t-button>
+      </view>
+    </view>
+
+    <!-- 隐藏的 Canvas -->
+    <canvas type="2d" id="collageCanvas" class="hidden-canvas"></canvas>
+  </view>
+</tool-page>
